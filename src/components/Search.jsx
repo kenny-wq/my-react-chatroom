@@ -1,21 +1,23 @@
 import { addDoc, collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { db } from '../firebase';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import { CurrentFriendContext } from '../contexts/CurrentFriendContext';
 
-const Search = ({currentUser}) => {
-  const [searchWords, setSearchWords] = useState(null);
+const Search = () => {
+  const { setCurrentFriend:setFriendName } = useContext(CurrentFriendContext);
+  const [searchWords, setSearchWords] = useState("");
   const [searchResult, setSearchResult] = useState(null);
   const [searchResultId, setSearchResultId] = useState(null);
+  const { currentUser } = useContext(CurrentUserContext);
   async function handleKeyDown(e) {
     if (e.key === 'Enter') {
-      // console.log(searchWords);
       const usersRef = collection(db, "users");
       const q = query(usersRef, where("displayName", "==", searchWords));
       const results = await getDocs(q);
-      results.forEach((result) => {
+      results.forEach((result) => {  // assume that there is only one result
         setSearchResult(result.data());
         setSearchResultId(result.id);
-        // console.log(result.data());
       })
     }
   }
@@ -34,22 +36,35 @@ const Search = ({currentUser}) => {
     const chatsDocResult = await getDoc(chatsDocRef);
     if (chatsDocResult.exists()) {
       // update chat doc result;
+      setFriendName(searchUserName);
     } else {
       await setDoc(chatsDocRef, {
         messages:[]
       })
     }
-    const userChatDocRef = doc(db, "userChats", currentUserName + searchUserName);
-    const userChatDocResult = await getDoc(userChatDocRef);
-    if (userChatDocResult.exists()) {
+    const userToSearchUserDocRef = doc(db, "userChats", currentUserName + searchUserName);
+    const userToSearchUserDocResult = await getDoc(userToSearchUserDocRef);
+    if (userToSearchUserDocResult.exists()) {
       //
     } else {
-      await setDoc(userChatDocRef, {
-        user1: currentUserName,
-        user2: searchUserName,
-        photoURL: user.data().photoURL,
-        latestMessage: ""
-      })
+      try {
+        await setDoc(userToSearchUserDocRef, {
+          user1: currentUserName,
+          user2: searchUserName,
+          photoURL: user.data().photoURL,
+          latestMessage: ""
+        })
+        const searchUserToUserDocRef = doc(db, "userChats", searchUserName + currentUserName);
+        await setDoc(searchUserToUserDocRef, {
+          user1: searchUserName,
+          user2: currentUserName,
+          photoURL: currentUser.photoURL,
+          latestMessage: ""
+        })
+      } catch (e) {
+        console.log(e);
+      }
+      
     }
     setSearchResult(null);
     setSearchWords("");

@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { auth, db, storage } from '../firebase';
 import {createUserWithEmailAndPassword, updateProfile} from 'firebase/auth'
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { v4 as uid } from 'uuid';
 
 const Register = () => {
@@ -45,7 +45,8 @@ const Register = () => {
             displayName,
             photoURL
         })
-        await addDoc(collection(db, "users"), {  // add to database
+        await setDoc(doc(db, "users",user.user.uid), {  // add to database
+            uid: user.user.uid,
             displayName,
             email,
             photoURL
@@ -55,7 +56,6 @@ const Register = () => {
             navigate("/");
         }
     }
-
 
     return (
         <div className='register-container'>

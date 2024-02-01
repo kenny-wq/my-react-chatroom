@@ -1,36 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Nav from "../components/Nav";
 import Search from "../components/Search";
 import Chats from "../components/Chats";
 import ChatPanel from "../components/ChatPanel";
+import { useNavigate } from "react-router-dom";
+import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
-import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const navigate = useNavigate();
   
-  const [user, setUser] = useState(null);
-  
-  onAuthStateChanged(auth, (user) => {
-    console.log("execute");
-    if (user) {
-      setUser(user);
-    } else {
-      navigate("/");
-    }
-  })
+  // const [user, setUser] = useState(null);
+  const { currentUser } = useContext(CurrentUserContext);
+  const [friendName, setFriendName] = useState("");
 
+  // useEffect(() => {
+  //   console.log(currentUser);
+  //   if (currentUser === null) {
+  //     navigate("/");
+  //   }  
+  // },[])
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+          navigate("/");
+        }
+    })
+  }, []);
 
   return (
     <div className="home-container">
-      <Nav photoURL={user?.photoURL} displayName={user?.displayName } />
+      <Nav/>
       <div className="main">
         <div className="sidebar">
-          <Search currentUser={user}/>
+          <Search />
           <Chats />
         </div>
-        <ChatPanel />
+        <ChatPanel/>
       </div>
     </div>
   );
