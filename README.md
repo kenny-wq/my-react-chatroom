@@ -25,6 +25,8 @@ A simple chat room that user can register, login, logout and chat with other use
 ![image](https://github.com/kenny-wq/my-react-chatroom/assets/80817584/28c770e4-53a4-442d-bcc8-ec27c68eba41)
 
 - login
-![image](https://github.com/kenny-wq/react-chat-room/assets/80817584/beedfd9c-fcc2-4f00-a97d-f94f42bfce3f)
+![image](https://github.com/kenny-wq/my-react-chatroom/assets/80817584/2a94f4c1-107b-4852-b005-933f7cd17f51)
+
 - register
-![image](https://github.com/kenny-wq/react-chat-room/assets/80817584/0906ba75-db35-49e3-b2c2-d487ca2989d2)
+![image](https://github.com/kenny-wq/my-react-chatroom/assets/80817584/1e7ef5ff-fcd2-4572-8e4f-660456323b10)
+
