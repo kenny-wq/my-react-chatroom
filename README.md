@@ -1,6 +1,6 @@
 # React Chat Room
 ## live demo
-- link https://react-chat-room-vercel-oovh.vercel.app/
+- link https://my-react-chatroom.vercel.app/
   
 - test account:
   
