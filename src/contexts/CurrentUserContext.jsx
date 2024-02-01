@@ -8,7 +8,6 @@ export default function CurrentUserContextProvider({ children }) {
     const [currentUser, setCurrentUser] = useState(null);
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, (user) => {
-            console.log(user);
             setCurrentUser(user);
         })
         return () => {

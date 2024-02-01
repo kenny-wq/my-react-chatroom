@@ -5,14 +5,13 @@ import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { CurrentFriendContext } from '../contexts/CurrentFriendContext';
 
 const Chats = () => {
-  const { setCurrentFriend: setFriendName } = useContext(CurrentFriendContext);
+  const { setCurrentFriend } = useContext(CurrentFriendContext);
   const { currentUser } = useContext(CurrentUserContext);
   const [chats, setChats] = useState([]);
-  const currentUserName = currentUser?.displayName;
   useEffect(() => {
     async function fetchData() {
-      if (currentUserName) {
-        const q = query(collection(db, "userChats"), where("user1", "==", currentUserName));
+      if (currentUser) {
+        const q = query(collection(db, "userChats"), where("user1.uid", "==", currentUser.uid));
         onSnapshot(q, (results) => {
           setChats([]); // clear chats
           results.forEach((doc) => {  // copy all chats to chats
@@ -22,9 +21,9 @@ const Chats = () => {
       }
     }
     fetchData();
-  }, [currentUserName])
+  }, [currentUser])
   function handleFriendClick(chat) {
-    setFriendName(chat.user2);
+    setCurrentFriend(chat.user2);
   }
   
   return (
@@ -33,7 +32,7 @@ const Chats = () => {
         return <div className='user-chat' key={idx} onClick={()=>{handleFriendClick(chat)}}>
           <img src={chat.photoURL} alt="" />
           <div>
-            <p>{chat.user2}</p>
+            <p>{chat.user2.displayName}</p>
             <p className="latest-message">{chat.latestMessage}</p>
           </div>
         </div>

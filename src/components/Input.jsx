@@ -8,11 +8,11 @@ import { CurrentFriendContext } from '../contexts/CurrentFriendContext';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
 const Input = () => {
-  const {currentFriend:friendName} = useContext(CurrentFriendContext);
+  const {currentFriend} = useContext(CurrentFriendContext);
   const [message, setMessage] = useState("");
   const [image, setImage] = useState(null);
   const { currentUser } = useContext(CurrentUserContext);
-  const currentUserName = currentUser?.displayName;
+  const currentUserId = currentUser?.uid;
   const photoURL = currentUser?.photoURL;
   
   function handleMessageValueChange(e) {
@@ -22,22 +22,21 @@ const Input = () => {
     setImage(e.target.files[0]);
   }
   async function handleButtonClick() {
-    if (friendName) {
-      let nameId; // chat 的 id
-      console.log("here");
-      if (currentUserName < friendName) {
-        nameId = currentUserName + friendName;
+    if (currentFriend) {
+      let chatId; // chat 的 id
+      if (currentUserId < currentFriend.uid) {
+        chatId = currentUserId + currentFriend.uid;
       }
       else {
-        nameId = friendName + currentUserName;
+        chatId = currentFriend.uid + currentUserId;
       }
       if (message) {
         //update chat message
-        await updateDoc(doc(db, "chats", nameId), { messages: arrayUnion({ id: uuid(), content: message, user: currentUserName, photoURL, type: "message" }) });
+        await updateDoc(doc(db, "chats", chatId), { messages: arrayUnion({ id: uuid(), content: message, user: currentUser.uid, photoURL, type: "message" }) });
         //update currentUser latest message
-        await updateDoc(doc(db, 'userChats', currentUserName + friendName), { latestMessage: message });
+        await updateDoc(doc(db, 'userChats', currentUserId + currentFriend.uid), { latestMessage: message });
         //update friend latest message
-        await updateDoc(doc(db, 'userChats', friendName + currentUserName), { latestMessage: message });
+        await updateDoc(doc(db, 'userChats', currentFriend.uid + currentUserId), { latestMessage: message });
         setMessage("");
       }
       if (image) {
@@ -45,11 +44,11 @@ const Input = () => {
         await uploadBytes(imagesRef, image);
         let messageImageURL = await getDownloadURL(imagesRef);
         //update chat message
-        await updateDoc(doc(db, "chats", nameId), { messages: arrayUnion({ id: uuid(), content: messageImageURL, user: currentUserName, photoURL, type: "image" }) });
+        await updateDoc(doc(db, "chats", chatId), { messages: arrayUnion({ id: uuid(), content: messageImageURL, user: currentUser.uid, photoURL, type: "image" }) });
         //update currentUser latest message
-        await updateDoc(doc(db, 'userChats', currentUserName + friendName), { latestMessage: 'image' });
+        await updateDoc(doc(db, 'userChats', currentUserId + currentFriend.uid), { latestMessage: 'image' });
         //update friend latest message
-        await updateDoc(doc(db, 'userChats', friendName + currentUserName), { latestMessage: 'image' });
+        await updateDoc(doc(db, 'userChats', currentFriend.uid + currentUserId), { latestMessage: 'image' });
         setImage("");
       }
     }

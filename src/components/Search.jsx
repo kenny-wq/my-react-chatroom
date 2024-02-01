@@ -27,12 +27,12 @@ const Search = () => {
   async function handleResultClick() {
     const docRef = doc(db, "users", searchResultId);
     const user = await getDoc(docRef);
-    console.log(user.data());
-    console.log(currentUser);
+    let currentUserUid = currentUser.uid;
     let currentUserName = currentUser.displayName;
+    let searchUserUid = user.data().uid;
     let searchUserName = user.data().displayName;
-    const name = currentUserName < searchUserName ? currentUserName + searchUserName : searchUserName + currentUserName; 
-    const chatsDocRef = doc(db, "chats", name);
+    const chatsId = currentUserUid < searchUserUid ? currentUserUid + searchUserUid : searchUserUid + currentUserUid; 
+    const chatsDocRef = doc(db, "chats", chatsId);
     const chatsDocResult = await getDoc(chatsDocRef);
     if (chatsDocResult.exists()) {
       // update chat doc result;
@@ -42,22 +42,22 @@ const Search = () => {
         messages:[]
       })
     }
-    const userToSearchUserDocRef = doc(db, "userChats", currentUserName + searchUserName);
+    const userToSearchUserDocRef = doc(db, "userChats", currentUserUid + searchUserUid);
     const userToSearchUserDocResult = await getDoc(userToSearchUserDocRef);
     if (userToSearchUserDocResult.exists()) {
       //
     } else {
       try {
         await setDoc(userToSearchUserDocRef, {
-          user1: currentUserName,
-          user2: searchUserName,
+          user1: {uid:currentUser.uid,name:currentUser.displayName,photoURL: currentUser.photoURL},
+          user2: user.data(),
           photoURL: user.data().photoURL,
           latestMessage: ""
         })
-        const searchUserToUserDocRef = doc(db, "userChats", searchUserName + currentUserName);
+        const searchUserToUserDocRef = doc(db, "userChats", searchUserUid + currentUserUid);
         await setDoc(searchUserToUserDocRef, {
-          user1: searchUserName,
-          user2: currentUserName,
+          user1: user.data(),
+          user2: {uid:currentUser.uid,displayName:currentUser.displayName,photoURL: currentUser.photoURL},
           photoURL: currentUser.photoURL,
           latestMessage: ""
         })
@@ -76,7 +76,7 @@ const Search = () => {
       </div>
       {searchResult &&
         <div className='search-result' onClick={handleResultClick}>
-          <img src={searchResult.photoURL} alt="" />
+          <img src={searchResult.photoURL} alt=""/>
           <p>{searchResult.displayName}</p>
         </div>
       }

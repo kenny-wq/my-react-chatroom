@@ -15,12 +15,6 @@ const Home = () => {
   const { currentUser } = useContext(CurrentUserContext);
   const [friendName, setFriendName] = useState("");
 
-  // useEffect(() => {
-  //   console.log(currentUser);
-  //   if (currentUser === null) {
-  //     navigate("/");
-  //   }  
-  // },[])
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (!user) {

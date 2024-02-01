@@ -52,7 +52,6 @@ const Register = () => {
             photoURL
         })
         if (signupSuccess) {
-            console.log(user.user);
             navigate("/");
         }
     }

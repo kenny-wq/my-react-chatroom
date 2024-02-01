@@ -6,21 +6,20 @@ import { CurrentFriendContext } from '../contexts/CurrentFriendContext';
 import Message from './Message';
 
 const ChatWindow = () => {
-  const { currentFriend:friendName } = useContext(CurrentFriendContext);
+  const { currentFriend } = useContext(CurrentFriendContext);
   const [messages, setMessages] = useState([]);
   const { currentUser } = useContext(CurrentUserContext);
   const currentUserName = currentUser?.displayName;
   useEffect(() => {
     async function fetch() {
-      if (friendName) {
-        let nameId; // chat的id
-        if (currentUserName < friendName) {
-          nameId = currentUserName + friendName;
+      if (currentFriend) {
+        let chatId; 
+        if (currentUser.uid < currentFriend.uid) {
+          chatId = currentUser.uid + currentFriend.uid;
         } else {
-          nameId = friendName + currentUserName;
+          chatId = currentFriend.uid + currentUser.uid;
         }
-        console.log(nameId);
-        const docRef = doc(db, "chats", nameId);
+        const docRef = doc(db, "chats", chatId);
         onSnapshot(docRef, (results) => {
             if (results.exists()) {
               setMessages(results.data().messages);
@@ -29,12 +28,10 @@ const ChatWindow = () => {
               console.log(results);
             }
         })
-        console.log(friendName);
-        console.log(messages);
       }
     }
     fetch();
-  }, [friendName])
+  }, [currentFriend])
   return (
     <div className='chatwindow'>
       {messages && messages.map((message, idx) => {
